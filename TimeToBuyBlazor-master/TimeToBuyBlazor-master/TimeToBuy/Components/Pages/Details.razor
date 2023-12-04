@@ -1,0 +1,43 @@
+@page "/details/{id:int}"
+@using TimeToBuy.Data
+@inject ApplicationDbContext Db
+@inject CartService CartService
+
+
+<div class="container">
+    <div class="left-column">
+        <img src="@_product.ImageUrl" alt="Product Image">
+    </div>
+    <div class="right-column">
+        <div class="main-content">
+            <h1>@_product.Name</h1>
+            <p>@_product.Description</p>
+        </div>
+
+        <div class="checkout-box">
+            <form @formname="AddToCart" @onsubmit="AddToCart" method="post" data-enhance>
+                <button type="submit">Add to Cart</button>
+                <AntiforgeryToken />
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; }
+    private Product _product;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _product = await Db.Product.FindAsync(Id);
+    }
+
+    private void AddToCart()
+    {
+        CartService.AddToCart(new AddItemToCartCommand(_product.Id, _product.CurrentPrice, _product.Name));
+    }
+}

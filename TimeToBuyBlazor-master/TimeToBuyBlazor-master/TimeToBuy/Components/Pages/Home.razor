@@ -1,0 +1,75 @@
+﻿@page "/"
+@using TimeToBuy.Data
+@inject ApplicationDbContext Db
+@attribute [StreamRendering]
+
+<PageTitle>Products</PageTitle>
+<form method="GET" class="search-form">
+	<InputText @bind-Value="SearchTerm" placeholder="Search for products" />
+	<button type="submit">Say Hello</button>
+</form>
+@if (_products == null)
+
+{
+	<p><em>Loading...</em></p>
+}
+
+else if (_products.Count == 0)
+
+{
+	<p><em>No products found</em></p>
+}
+
+else
+
+{
+
+
+	<section class="card-list product-list">
+		@foreach (var product in _products)
+
+		{
+			<a href="/details/@product.Id" class="card">
+				<div class="card-content">
+					<img src="@product.ImageUrl" alt="@product.Name cover image" class="card-img" />
+					<h2 class="title">@product.Name</h2>
+					<p>@product.Description</p>
+				</div>
+				<div class="card-footer">
+					<h3 class="price">@product.CurrentPrice.ToString("C")</h3>
+				</div>
+			</a>
+
+		}
+
+	</section>
+}
+
+@code {
+
+	[SupplyParameterFromQuery]
+
+	public string SearchTerm { get; set; }
+
+	List<Product> _products;
+
+	protected override async Task OnInitializedAsync()
+
+	{
+
+		await Task.Delay(1000);
+
+		_products = await Db.Product
+
+		.Where(x => string.IsNullOrEmpty(SearchTerm) || x.Name.ToLower()
+
+		.Contains(SearchTerm.ToLower()))
+
+		.Take(50)
+
+		.ToListAsync();
+
+	}
+
+
+}

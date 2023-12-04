@@ -1,0 +1,36 @@
+@page "/Cart"
+@inject CartService CartService
+
+<article>
+    <h2>Shopping Basket</h2>
+    
+    <section id="shoppingCart">
+        <section id="lineItems">
+            @foreach (var item in _cart.Items){
+                <div class="line">
+                <div>
+                    <h4>@item.ProductName</h4>
+                    <p>@item.Quantity</p></div>
+                <div>
+                    <h3>@item.LinePrice.ToString("C")</h3>
+                </div>
+            </div>
+
+            }
+            
+        </section>
+        <section id="summary">
+            Subtotal (1 items): <strong>@_cart.TotalPrice.ToString("C")</strong>
+        </section>
+    </section>
+    
+</article>
+
+@code {
+
+    private Data.Cart? _cart;
+    protected override async Task OnInitializedAsync()
+    {
+        _cart = CartService.GetCart();
+    }
+}
